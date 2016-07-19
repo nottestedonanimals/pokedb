@@ -75,6 +75,7 @@ public class BuildTable {
             String createTable = "CREATE TABLE PokedexEntryMapping (" +
                     "PokemonId INT NOT NULL, " +
                     "PokedexEntryId INT," +
+                    "PRIMARY KEY(PokemonId, PokedexEntryId)," +
                     "FOREIGN KEY(pokemonId) REFERENCES Pokemon(Id))";
 
             stmt.executeUpdate(createTable);
@@ -103,6 +104,7 @@ public class BuildTable {
             String createStatement = "CREATE TABLE EggGroupMapping (" +
                     "PokemonId INT NOT NULL, " +
                     "EggGroupId INT," +
+                    "PRIMARY KEY(PokemonId, EggGroupId)," +
                     "FOREIGN KEY(pokemonId) REFERENCES Pokemon(Id))";
 
             stmt.executeUpdate(createStatement);
@@ -125,6 +127,7 @@ public class BuildTable {
             String createStatement = "CREATE TABLE PokemonLanguage (" +
                     "pokemonId INT NOT NULL," +
                     "languageID INT NOT NULL," +
+                    "PRIMARY KEY(PokemonId, LanguageId)," +
                     "FOREIGN KEY(pokemonId) REFERENCES Pokemon(Id))";
 
             stmt.executeUpdate(createStatement);

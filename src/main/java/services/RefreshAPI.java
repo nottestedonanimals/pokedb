@@ -50,9 +50,6 @@ public class RefreshAPI {
         }
         int evoChain = poke.getEvolutionChain().getId();
         int genId = poke.getGeneration().getId();
-        for(PokemonSpeciesVariety v: poke.getVarieties()){
-            System.out.println(v);
-        }
         int habitatId;
         try{
             habitatId = poke.getHabitat().getId();
@@ -70,7 +67,10 @@ public class RefreshAPI {
             BuildTable.insertPokedexMapping(cnxn, pokeId, p.getPokedex().getId());
         }
         for(Name i: poke.getNames()){
-            BuildTable.insertEggGroupMapping(cnxn, pokeId, i.getLanguage().getId());
+            BuildTable.insertPokemonLanguageMapping(cnxn, pokeId, i.getLanguage().getId());
+        }
+        for(PokemonSpeciesVariety v: poke.getVarieties()){
+            System.out.println(v);
         }
     }
 }
