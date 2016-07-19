@@ -13,6 +13,7 @@ public class RefreshAPI {
         BuildTable.createPokedexMappingTable(cnxn);
         BuildTable.createEggGroupMappingTable(cnxn);
         BuildTable.createPokemonLanguageMapping(cnxn);
+        BuildTable.createPokemonVarietyTable(cnxn);
 
         getPokemonData(3, cnxn);
 
@@ -70,7 +71,7 @@ public class RefreshAPI {
             BuildTable.insertPokemonLanguageMapping(cnxn, pokeId, i.getLanguage().getId());
         }
         for(PokemonSpeciesVariety v: poke.getVarieties()){
-            System.out.println(v);
+            BuildTable.insertPokemonVarietyMapping(cnxn, pokeId, v.getPokemon().getId(), v.getPokemon().getName());
         }
     }
 }

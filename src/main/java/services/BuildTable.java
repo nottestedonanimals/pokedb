@@ -86,6 +86,7 @@ public class BuildTable {
 
         } catch (Exception e){
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
         }
 
     }
@@ -110,6 +111,7 @@ public class BuildTable {
             stmt.executeUpdate(createStatement);
         }catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
         }
     }
 
@@ -121,19 +123,50 @@ public class BuildTable {
             cnxn.setAutoCommit(false);
             stmt = cnxn.createStatement();
 
-            stmt.executeUpdate("DROP TABLE IF EXISTS PokemonLanguage");
+            stmt.executeUpdate("DROP TABLE IF EXISTS PokemonLanguageMapping");
             cnxn.commit();
 
-            String createStatement = "CREATE TABLE PokemonLanguage (" +
+            String createStatement = "CREATE TABLE PokemonLanguageMapping (" +
                     "pokemonId INT NOT NULL," +
-                    "languageID INT NOT NULL," +
+                    "languageId INT NOT NULL," +
                     "PRIMARY KEY(PokemonId, LanguageId)," +
                     "FOREIGN KEY(pokemonId) REFERENCES Pokemon(Id))";
 
             stmt.executeUpdate(createStatement);
+            cnxn.commit();
+
+            stmt.close();
 
         }catch (Exception e){
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
+    }
+
+    static void createPokemonVarietyTable(Connection cnxn){
+        Statement stmt;
+        try{
+            cnxn.setAutoCommit(false);
+            stmt = cnxn.createStatement();
+
+            stmt.executeUpdate("DROP TABLE IF EXISTS PokemonVarietyMapping");
+            cnxn.commit();
+
+            String createStatement = "CREATE TABLE PokemonVarietyMapping (" +
+                    "pokemonId INT NOT NULL, " +
+                    "VarietyId INT NOT NULL, " +
+                    "VarietyName TEXT NOT NULL, " +
+                    "PRIMARY KEY (pokemonId, VarietyId) " +
+                    "FOREIGN KEY(pokemonId) REFERENCES Pokemon(Id))";
+
+            stmt.executeUpdate(createStatement);
+            cnxn.commit();
+
+            stmt.close();
+
+        }catch(Exception e){
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
         }
     }
 
@@ -237,7 +270,7 @@ public class BuildTable {
         PreparedStatement prep;
         try{
             cnxn.setAutoCommit(false);
-            String insertQuery = "INSERT INTO PokemonLanguage (pokemonId, languageId) " +
+            String insertQuery = "INSERT INTO PokemonLanguageMapping (pokemonId, languageId) " +
                     "VALUES (?, ?)";
             prep = cnxn.prepareStatement(insertQuery);
 
@@ -254,6 +287,32 @@ public class BuildTable {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
         }
+    }
 
+    static void insertPokemonVarietyMapping(Connection cnxn, int pokeId, int varietyId, String varietyName){
+
+        PreparedStatement prep;
+        try{
+            cnxn.setAutoCommit(false);
+            String insertQuery = "INSERT INTO PokemonVarietyMapping (pokemonId, VarietyId, VarietyName) " +
+                    "VALUES (?, ?, ?)";
+
+            prep = cnxn.prepareStatement(insertQuery);
+
+            prep.setInt(1, pokeId);
+            prep.setInt(2, varietyId);
+            prep.setString(3, varietyName);
+
+            prep.addBatch();
+            prep.executeBatch();
+
+            cnxn.commit();
+
+            prep.close();
+
+        }catch(Exception e){
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
     }
 }
