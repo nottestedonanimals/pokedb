@@ -1,9 +1,7 @@
-package client;
+package services;
 import me.sargunvohra.lib.pokekotlin.client.*;
 import me.sargunvohra.lib.pokekotlin.model.*;
 import java.sql.Connection;
-import java.util.List;
-import java.util.ArrayList;
 
 public class RefreshAPI {
 
@@ -14,8 +12,9 @@ public class RefreshAPI {
         BuildTable.createPokemonTable(cnxn);
         BuildTable.createPokedexMappingTable(cnxn);
         BuildTable.createEggGroupMappingTable(cnxn);
+        BuildTable.createPokemonLanguageMapping(cnxn);
 
-        getPokemonData(1, cnxn);
+        getPokemonData(3, cnxn);
 
         try{
             cnxn.close();
@@ -42,12 +41,6 @@ public class RefreshAPI {
         boolean genderDiff = poke.getHasGenderDifferences();
         boolean formSwitch = poke.getFormsSwitchable();
         int growthRate = poke.getGrowthRate().getId();
-        for(PokemonSpeciesDexEntry p: poke.getPokedexNumbers()){
-            BuildTable.insertPokedexMapping(cnxn, pokeId, p.getPokedex().getId());
-        }
-        for(NamedApiResource e: poke.getEggGroups()){
-            BuildTable.insertEggGroupMapping(cnxn, pokeId, e.getId());
-        }
         int shapeId = poke.getShape().getId();
         int evolveForm;
         try {
@@ -56,13 +49,10 @@ public class RefreshAPI {
             evolveForm = -999;
         }
         int evoChain = poke.getEvolutionChain().getId();
-        for(Name i: poke.getNames()){
-
-            i.getLanguage().getId();
-
-        }
         int genId = poke.getGeneration().getId();
-//        System.out.println(poke.getVarieties());
+        for(PokemonSpeciesVariety v: poke.getVarieties()){
+            System.out.println(v);
+        }
         int habitatId;
         try{
             habitatId = poke.getHabitat().getId();
@@ -72,5 +62,15 @@ public class RefreshAPI {
 
         BuildTable.insertPokemonData(cnxn, pokeId, pokeOrder, genderRate, captureRate, happy, baby, hatch, genderDiff, formSwitch,
                 growthRate, shapeId, evolveForm, evoChain, genId, habitatId);
+
+        for(NamedApiResource e: poke.getEggGroups()){
+            BuildTable.insertEggGroupMapping(cnxn, pokeId, e.getId());
+        }
+        for(PokemonSpeciesDexEntry p: poke.getPokedexNumbers()){
+            BuildTable.insertPokedexMapping(cnxn, pokeId, p.getPokedex().getId());
+        }
+        for(Name i: poke.getNames()){
+            BuildTable.insertEggGroupMapping(cnxn, pokeId, i.getLanguage().getId());
+        }
     }
 }

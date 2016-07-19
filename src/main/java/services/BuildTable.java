@@ -1,6 +1,5 @@
-package client;
+package services;
 import java.sql.*;
-import java.util.List;
 
 public class BuildTable {
 
@@ -19,7 +18,6 @@ public class BuildTable {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
         }
-        System.out.println("Opened database successfully");
 
         return cnxn;
     }
@@ -63,6 +61,7 @@ public class BuildTable {
     }
 
     static void createPokedexMappingTable(Connection cnxn){
+        // TODO: Add foreign key constraints to ids when tables are built
 
         Statement stmt;
         try{
@@ -75,7 +74,8 @@ public class BuildTable {
 
             String createTable = "CREATE TABLE PokedexEntryMapping (" +
                     "PokemonId INT NOT NULL, " +
-                    "PokedexEntryId INT PRIMARY KEY)";
+                    "PokedexEntryId INT," +
+                    "FOREIGN KEY(pokemonId) REFERENCES Pokemon(Id))";
 
             stmt.executeUpdate(createTable);
 
@@ -90,6 +90,7 @@ public class BuildTable {
     }
 
     static void createEggGroupMappingTable(Connection cnxn){
+        // TODO: Add foreign key constraints to ids when tables are built
 
         Statement stmt;
         try{
@@ -101,10 +102,34 @@ public class BuildTable {
 
             String createStatement = "CREATE TABLE EggGroupMapping (" +
                     "PokemonId INT NOT NULL, " +
-                    "EggGroupId INT PRIMARY KEY)";
+                    "EggGroupId INT," +
+                    "FOREIGN KEY(pokemonId) REFERENCES Pokemon(Id))";
 
             stmt.executeUpdate(createStatement);
         }catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
+    static void createPokemonLanguageMapping(Connection cnxn){
+        // TODO: Add foreign key constraints to ids when tables are built
+
+        Statement stmt;
+        try{
+            cnxn.setAutoCommit(false);
+            stmt = cnxn.createStatement();
+
+            stmt.executeUpdate("DROP TABLE IF EXISTS PokemonLanguage");
+            cnxn.commit();
+
+            String createStatement = "CREATE TABLE PokemonLanguage (" +
+                    "pokemonId INT NOT NULL," +
+                    "languageID INT NOT NULL," +
+                    "FOREIGN KEY(pokemonId) REFERENCES Pokemon(Id))";
+
+            stmt.executeUpdate(createStatement);
+
+        }catch (Exception e){
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
     }
@@ -202,5 +227,30 @@ public class BuildTable {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
         }
+    }
+
+    static void insertPokemonLanguageMapping(Connection cnxn, int pokeId, int languageId){
+
+        PreparedStatement prep;
+        try{
+            cnxn.setAutoCommit(false);
+            String insertQuery = "INSERT INTO PokemonLanguage (pokemonId, languageId) " +
+                    "VALUES (?, ?)";
+            prep = cnxn.prepareStatement(insertQuery);
+
+            prep.setInt(1, pokeId);
+            prep.setInt(2, languageId);
+
+            prep.addBatch();
+            prep.executeBatch();
+            cnxn.commit();
+
+            prep.close();
+
+        }catch(Exception e){
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+
     }
 }
