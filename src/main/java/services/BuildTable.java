@@ -22,7 +22,7 @@ public class BuildTable {
         return cnxn;
     }
 
-    static void createPokemonTable(Connection cnxn) {
+    static void createPokemonSpeciesTable(Connection cnxn) {
 
         try{
 

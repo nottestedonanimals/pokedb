@@ -9,7 +9,7 @@ public class RefreshAPI {
 
         Connection cnxn;
         cnxn = BuildTable.setConnection();
-        BuildTable.createPokemonTable(cnxn);
+        BuildTable.createPokemonSpeciesTable(cnxn);
         BuildTable.createPokedexMappingTable(cnxn);
         BuildTable.createEggGroupMappingTable(cnxn);
         BuildTable.createPokemonLanguageMapping(cnxn);
@@ -29,6 +29,14 @@ public class RefreshAPI {
 
 
     private static void getPokemonData(int pokemonId, Connection cnxn){
+        PokeApi pokeApi = new PokeApiClient();
+        Pokemon poke = pokeApi.getPokemon(pokemonId);
+        
+        int pokeId = poke.getId();
+        String pokeName = poke.getName();
+    }
+
+    private static void getPokemonSpeicesData(int pokemonId, Connection cnxn) {
 
         PokeApi pokeApi = new PokeApiClient();
         PokemonSpecies poke = pokeApi.getPokemonSpecies(pokemonId);
@@ -77,6 +85,7 @@ public class RefreshAPI {
     }
 
     private static void getMoveData(int pokemonId, Connection cnxn){
+
         PokeApi pokeApi = new PokeApiClient();
     }
 }
