@@ -15,7 +15,8 @@ public class RefreshAPI {
         BuildTable.createPokemonLanguageMapping(cnxn);
         BuildTable.createPokemonVarietyTable(cnxn);
 
-        getPokemonData(3, cnxn);
+        getPokemonData(1, cnxn);
+        getMoveData(1, cnxn);
 
         try{
             cnxn.close();
@@ -73,5 +74,9 @@ public class RefreshAPI {
         for(PokemonSpeciesVariety v: poke.getVarieties()){
             BuildTable.insertPokemonVarietyMapping(cnxn, pokeId, v.getPokemon().getId(), v.getPokemon().getName());
         }
+    }
+
+    private static void getMoveData(int pokemonId, Connection cnxn){
+        PokeApi pokeApi = new PokeApiClient();
     }
 }
