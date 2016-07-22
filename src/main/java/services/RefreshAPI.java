@@ -1,6 +1,7 @@
 package services;
 import me.sargunvohra.lib.pokekotlin.client.*;
 import me.sargunvohra.lib.pokekotlin.model.*;
+
 import java.sql.Connection;
 
 public class RefreshAPI {
@@ -9,14 +10,17 @@ public class RefreshAPI {
 
         Connection cnxn;
         cnxn = BuildTable.setConnection();
-        BuildTable.createPokemonSpeciesTable(cnxn);
+        BuildTable.createPokemonTable(cnxn);
         BuildTable.createPokedexMappingTable(cnxn);
         BuildTable.createEggGroupMappingTable(cnxn);
-        BuildTable.createPokemonLanguageMapping(cnxn);
+        BuildTable.createPokemonLanguageTable(cnxn);
         BuildTable.createPokemonVarietyTable(cnxn);
+        BuildTable.createPokemonAbilitiesMapping(cnxn);
+        BuildTable.createPokemonFormsMapping(cnxn);
+        BuildTable.createPokemonVersionGameIndexTable(cnxn);
 
         getPokemonData(1, cnxn);
-        getMoveData(1, cnxn);
+//        getMoveData(1, cnxn);
 
         try{
             cnxn.close();
@@ -28,59 +32,83 @@ public class RefreshAPI {
     }
 
 
-    private static void getPokemonData(int pokemonId, Connection cnxn){
+    private static void getPokemonData(int pokemonId, Connection cnxn) {
         PokeApi pokeApi = new PokeApiClient();
         Pokemon poke = pokeApi.getPokemon(pokemonId);
-        
+        PokemonSpecies pokeSpec = pokeApi.getPokemonSpecies(pokemonId);
+
         int pokeId = poke.getId();
         String pokeName = poke.getName();
-    }
-
-    private static void getPokemonSpeicesData(int pokemonId, Connection cnxn) {
-
-        PokeApi pokeApi = new PokeApiClient();
-        PokemonSpecies poke = pokeApi.getPokemonSpecies(pokemonId);
-
-        int pokeId = poke.getId();
+        int baseExp = poke.getBaseExperience();
+        int pokeHeight = poke.getHeight();
+        boolean defaultSpecies = poke.isDefault();
         int pokeOrder = poke.getOrder();
-        int genderRate = poke.getGenderRate();
-        int captureRate = poke.getCaptureRate();
-        int happy = poke.getBaseHappiness();
-        boolean baby = poke.isBaby();
-        int hatch = poke.getHatchCounter();
-        boolean genderDiff = poke.getHasGenderDifferences();
-        boolean formSwitch = poke.getFormsSwitchable();
-        int growthRate = poke.getGrowthRate().getId();
-        int shapeId = poke.getShape().getId();
+        int pokeWeight = poke.getWeight();
+        int genderRate = pokeSpec.getGenderRate();
+        int captureRate = pokeSpec.getCaptureRate();
+        int happy = pokeSpec.getBaseHappiness();
+        boolean baby = pokeSpec.isBaby();
+        int hatch = pokeSpec.getHatchCounter();
+        boolean genderDiff = pokeSpec.getHasGenderDifferences();
+        boolean formSwitch = pokeSpec.getFormsSwitchable();
+        int growthRate = pokeSpec.getGrowthRate().getId();
+        int shapeId = pokeSpec.getShape().getId();
         int evolveForm;
         try {
-            evolveForm = poke.getEvolvesFromSpecies().getId();
-        } catch (NullPointerException ne){
+            evolveForm = pokeSpec.getEvolvesFromSpecies().getId();
+        } catch (NullPointerException ne) {
             evolveForm = -999;
         }
-        int evoChain = poke.getEvolutionChain().getId();
-        int genId = poke.getGeneration().getId();
+        int evoChain = pokeSpec.getEvolutionChain().getId();
+        int genId = pokeSpec.getGeneration().getId();
         int habitatId;
-        try{
-            habitatId = poke.getHabitat().getId();
-        } catch (NullPointerException ne){
+        try {
+            habitatId = pokeSpec.getHabitat().getId();
+        } catch (NullPointerException ne) {
             habitatId = -999;
         }
 
-        BuildTable.insertPokemonData(cnxn, pokeId, pokeOrder, genderRate, captureRate, happy, baby, hatch, genderDiff, formSwitch,
-                growthRate, shapeId, evolveForm, evoChain, genId, habitatId);
+        BuildTable.insertPokemonData(cnxn, pokeId, pokeName, baseExp, pokeHeight, defaultSpecies, pokeOrder,
+                pokeWeight, genderRate, captureRate, happy, baby, hatch, genderDiff, formSwitch, growthRate, shapeId,
+                evolveForm, evoChain, genId, habitatId);
 
-        for(NamedApiResource e: poke.getEggGroups()){
+
+        //USING CALL TO CENTRAL TABLE DATA ALLOWS US TO MAKE THESE CALLS IN ONE FUNCTION - DOES NOT BELONG IN CENTRAL TABLE
+        //MAPS TO CENTRAL TABLE
+        //TODO: SHOULD CONVERT SOME OF THSE MAPPING TABLES TO LOOKUP TABLES AFTER I DECIDE HOW TO MERGE. THESE ARE GOOD PLACEHOLDERS THAT WILL ALLOW ME TO MATCH INFO
+        for (PokemonAbility a : poke.getAbilities()) {
+
+            BuildTable.insertPokemonAbilityMapping(cnxn, pokeId, a.getAbility().getId());
+        }
+
+        for (NamedApiResource f : poke.getForms()) {
+
+            BuildTable.insertPokemonFormsMapping(cnxn, pokeId, f.getId());
+        }
+
+        for (VersionGameIndex g : poke.getGameIndices()) {
+            BuildTable.insertPokemonVersionGameIndexTable(cnxn, pokeId, g.getGameIndex(), g.getVersion().getName(),
+                    g.getVersion().getId());
+        }
+        for (NamedApiResource e : pokeSpec.getEggGroups()) {
             BuildTable.insertEggGroupMapping(cnxn, pokeId, e.getId());
         }
-        for(PokemonSpeciesDexEntry p: poke.getPokedexNumbers()){
+        for (PokemonSpeciesDexEntry p : pokeSpec.getPokedexNumbers()) {
             BuildTable.insertPokedexMapping(cnxn, pokeId, p.getPokedex().getId());
         }
-        for(Name i: poke.getNames()){
-            BuildTable.insertPokemonLanguageMapping(cnxn, pokeId, i.getLanguage().getId());
+        for (Name i : pokeSpec.getNames()) {
+            BuildTable.insertPokemonLanguageTable(cnxn, pokeId, i.getLanguage().getId(), i.getLanguage().getName(), i.getName());
         }
-        for(PokemonSpeciesVariety v: poke.getVarieties()){
+        for (PokemonSpeciesVariety v : pokeSpec.getVarieties()) {
             BuildTable.insertPokemonVarietyMapping(cnxn, pokeId, v.getPokemon().getId(), v.getPokemon().getName());
+        }
+
+
+        for (PokemonHeldItem h : poke.getHeldItems()) {
+            System.out.println(h);
+
+            System.out.println(pokeId);
+            System.out.println(h.getItem().getId());
         }
     }
 
