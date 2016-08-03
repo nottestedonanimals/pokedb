@@ -18,9 +18,11 @@ public class RefreshAPI {
         BuildTable.createPokemonAbilitiesMapping(cnxn);
         BuildTable.createPokemonFormsMapping(cnxn);
         BuildTable.createPokemonVersionGameIndexTable(cnxn);
+        BuildTable.createPokemonMoveMapping(cnxn);
+        BuildTable.createPokemonMoves(cnxn);
 
-        getPokemonData(1, cnxn);
-//        getMoveData(1, cnxn);
+//        getPokemonData(1, cnxn);
+        getMoveData(1, cnxn);
 
         try{
             cnxn.close();
@@ -103,6 +105,10 @@ public class RefreshAPI {
             BuildTable.insertPokemonVarietyMapping(cnxn, pokeId, v.getPokemon().getId(), v.getPokemon().getName());
         }
 
+        for (PokemonMove m: poke.getMoves()){
+
+        }
+
 
         for (PokemonHeldItem h : poke.getHeldItems()) {
             System.out.println(h);
@@ -115,5 +121,18 @@ public class RefreshAPI {
     private static void getMoveData(int pokemonId, Connection cnxn){
 
         PokeApi pokeApi = new PokeApiClient();
+        Pokemon poke = pokeApi.getPokemon(pokemonId);
+
+        int pokeId = poke.getId();
+
+        for (PokemonMove m: poke.getMoves()){
+
+            BuildTable.insertPokemonMoveMapping(cnxn, pokeId, m.getMove().getId());
+
+            for (PokemonMoveVersion v: m.getVersionGroupDetails()){
+
+                BuildTable.insertPokemonMoveData(cnxn, m.getMove().getId(), v.getVersionGroup().getId(), m.getMove().getName(), v.getMoveLearnMethod().getId(), v.getLevelLearnedAt());
+            }
+        }
     }
 }

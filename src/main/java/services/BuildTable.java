@@ -248,6 +248,55 @@ public class BuildTable {
         }
     }
 
+    static void createPokemonMoves(Connection cnxn){
+        Statement stmt;
+        try{
+            cnxn.setAutoCommit(false);
+            stmt = cnxn.createStatement();
+
+            stmt.executeUpdate("DROP TABLE IF EXISTS PokemonMoves");
+            cnxn.commit();
+
+            String createQuery = "CREATE TABLE PokemonMoves (" +
+                    "Id INT NOT NULL, " +
+                    "versionId INT NOT NULL, " +
+                    "Name TEXT NOT NULL, " +
+                    "LearnMethodId INT NOT NULL, " +
+                    "LevelLearned INT NOT NULL, " +
+                    "PRIMARY KEY (Id, versionId)," +
+                    "FOREIGN KEY (pokemonId) REFERENCES Pokemon(Id))";
+
+            stmt.executeUpdate(createQuery);
+            cnxn.commit();
+
+        } catch(Exception e){
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
+    }
+
+    static void createPokemonMoveMapping(Connection cnxn){
+        Statement stmt;
+        try{
+            cnxn.setAutoCommit(false);
+            stmt = cnxn.createStatement();
+
+            String createQuery = "CREATE TABLE PokemonMoveMapping (" +
+                    "pokemonId INT NOT NULL, " +
+                    "moveId INT NOT NULL, " +
+                    "PRIMARY KEY (pokemonId, moveId), " +
+                    "FOREIGN KEY (pokemonId) REFERENCES Pokemon(Id))";
+
+            stmt.executeUpdate(createQuery);
+            cnxn.commit();
+
+
+        } catch (Exception e){
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
+    }
+
     static void insertPokemonData(Connection cnxn, int id, String name, int baseExp, int height, boolean dfSpecies,
                                   int order, int weight, int genderRate, int captureRate, int happy, boolean isBaby, int hatch,
                                   boolean genderDiff, boolean forms, int growthRate, int shapeId,
@@ -463,6 +512,58 @@ public class BuildTable {
             prep.setInt(2, gameIndex);
             prep.setString(3, versionName);
             prep.setInt(4, versionId);
+
+            prep.addBatch();
+            prep.executeBatch();
+
+            cnxn.commit();
+            prep.close();
+
+        }catch(Exception e){
+            System.err.println( e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
+    }
+
+    static void insertPokemonMoveData(Connection cnxn, int moveId, int versionId, String moveName,
+                                      int learnMethodId, int levelLearned){
+        PreparedStatement prep;
+        try{
+            cnxn.setAutoCommit(false);
+            String insertQuery = "INSERT INTO PokemonMoves (Id, versionId, Name, LearnMethodId, LevelLearned) " +
+                    "VALUES (?, ?, ?, ?)";
+
+            prep = cnxn.prepareStatement(insertQuery);
+
+            prep.setInt(1, moveId);
+            prep.setInt(2, versionId);
+            prep.setString(3, moveName);
+            prep.setInt(4, learnMethodId);
+            prep.setInt(5, levelLearned);
+
+            prep.addBatch();
+            prep.executeBatch();
+
+            cnxn.commit();
+            prep.close();
+
+        } catch (Exception e){
+            System.err.println( e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
+    }
+
+    static void insertPokemonMoveMapping(Connection cnxn, int pokemonId, int moveId){
+        PreparedStatement prep;
+        try{
+            cnxn.setAutoCommit(false);
+            String insertQuery = "INSERT INTO PokemonMoveMapping (pokemonId, moveId) " +
+                    "VALUES (?, ?)";
+
+            prep = cnxn.prepareStatement(insertQuery);
+
+            prep.setInt(1, pokemonId);
+            prep.setInt(2, moveId);
 
             prep.addBatch();
             prep.executeBatch();
