@@ -8,6 +8,8 @@ public class RefreshAPI {
 
     public static void main(String args[]){
 
+        int maxPokeId = 722;
+
         Connection cnxn;
         cnxn = BuildTable.setConnection();
         BuildTable.createPokemonTable(cnxn);
@@ -21,8 +23,14 @@ public class RefreshAPI {
         BuildTable.createPokemonMoveMapping(cnxn);
         BuildTable.createPokemonMoves(cnxn);
 
-//        getPokemonData(1, cnxn);
-        getMoveData(1, cnxn);
+
+        int id = 1;
+        while(id < maxPokeId){
+            getPokemonData(id, cnxn);
+            System.out.println(id + " of " + (maxPokeId-1) + "\r");
+            id ++;
+        }
+//        getMoveData(1, cnxn);
 
         try{
             cnxn.close();
@@ -35,6 +43,7 @@ public class RefreshAPI {
 
 
     private static void getPokemonData(int pokemonId, Connection cnxn) {
+
         PokeApi pokeApi = new PokeApiClient();
         Pokemon poke = pokeApi.getPokemon(pokemonId);
         PokemonSpecies pokeSpec = pokeApi.getPokemonSpecies(pokemonId);
@@ -106,7 +115,7 @@ public class RefreshAPI {
         }
 
         for (PokemonMove m: poke.getMoves()){
-
+            BuildTable.insertPokemonMoveMapping(cnxn, pokeId, m.getMove().getId());
         }
 
 

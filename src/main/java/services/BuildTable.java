@@ -13,7 +13,7 @@ public class BuildTable {
 
         try {
             Class.forName("org.sqlite.JDBC");
-            cnxn = DriverManager.getConnection("jdbc:sqlite:src\\main\\resources\\test.db");
+            cnxn = DriverManager.getConnection("jdbc:sqlite:/home/matt/GitRepos/pokedb/src/main/resources/test.db");
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
@@ -59,7 +59,7 @@ public class BuildTable {
             stmt.close();
 
         } catch (Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() + " in Pokemon");
             System.exit(0);
 
         }
@@ -90,7 +90,7 @@ public class BuildTable {
             stmt.close();
 
         } catch (Exception e){
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.err.println(e.getClass().getName() + ": " + e.getMessage() + " in PokedexEntryMapping");
             System.exit(0);
         }
 
@@ -115,7 +115,7 @@ public class BuildTable {
 
             stmt.executeUpdate(createQuery);
         }catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.err.println(e.getClass().getName() + ": " + e.getMessage() + " in EggGroupMapping");
             System.exit(0);
         }
     }
@@ -144,7 +144,7 @@ public class BuildTable {
             stmt.close();
 
         }catch (Exception e){
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.err.println(e.getClass().getName() + ": " + e.getMessage() + " in PokemonLanguage");
             System.exit(0);
         }
     }
@@ -171,7 +171,7 @@ public class BuildTable {
             stmt.close();
 
         }catch(Exception e){
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.err.println(e.getClass().getName() + ": " + e.getMessage() + " in PokemonVarietyMapping");
             System.exit(0);
         }
     }
@@ -194,7 +194,7 @@ public class BuildTable {
             stmt.executeUpdate(createQuery);
             cnxn.commit();
         }catch(Exception e){
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.err.println(e.getClass().getName() + ": " + e.getMessage() + " in PokemonAbilitiesMapping");
             System.exit(0);
         }
     }
@@ -217,7 +217,7 @@ public class BuildTable {
             stmt.executeUpdate(createQuery);
             cnxn.commit();
         }catch(Exception e){
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.err.println(e.getClass().getName() + ": " + e.getMessage() + " in PokemonFormsMapping");
             System.exit(0);
         }
     }
@@ -243,7 +243,7 @@ public class BuildTable {
             cnxn.commit();
 
         }catch(Exception e){
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.err.println(e.getClass().getName() + ": " + e.getMessage() + " in PokemonVersionGameIndex");
             System.exit(0);
         }
     }
@@ -264,13 +264,13 @@ public class BuildTable {
                     "LearnMethodId INT NOT NULL, " +
                     "LevelLearned INT NOT NULL, " +
                     "PRIMARY KEY (Id, versionId)," +
-                    "FOREIGN KEY (pokemonId) REFERENCES Pokemon(Id))";
+                    "FOREIGN KEY (Id) REFERENCES PokemonMoveMapping(Id))";
 
             stmt.executeUpdate(createQuery);
             cnxn.commit();
 
         } catch(Exception e){
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.err.println(e.getClass().getName() + ": " + e.getMessage() + "in PokemonMoves");
             System.exit(0);
         }
     }
@@ -280,6 +280,9 @@ public class BuildTable {
         try{
             cnxn.setAutoCommit(false);
             stmt = cnxn.createStatement();
+
+            stmt.executeUpdate("DROP TABLE IF EXISTS PokemonMoveMapping");
+            cnxn.commit();
 
             String createQuery = "CREATE TABLE PokemonMoveMapping (" +
                     "pokemonId INT NOT NULL, " +
@@ -292,7 +295,7 @@ public class BuildTable {
 
 
         } catch (Exception e){
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.err.println(e.getClass().getName() + ": " + e.getMessage() + " in PokemonMoveMapping");
             System.exit(0);
         }
     }
@@ -339,7 +342,7 @@ public class BuildTable {
             prep.close();
 
         } catch (Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() + " in Pokemon");
             System.exit(0);
 
         }
@@ -365,7 +368,7 @@ public class BuildTable {
             prep.close();
 
         } catch (Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() + " in PokedexEntryMapping");
             System.exit(0);
         }
     }
@@ -391,7 +394,7 @@ public class BuildTable {
             prep.close();
 
         } catch (Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() + " in EggGroupMapping");
             System.exit(0);
         }
     }
@@ -417,7 +420,7 @@ public class BuildTable {
             prep.close();
 
         }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() + " in PokemonLanguage");
             System.exit(0);
         }
     }
@@ -444,7 +447,7 @@ public class BuildTable {
             prep.close();
 
         }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() + " in PokemonVarietyMapping");
             System.exit(0);
         }
     }
@@ -469,7 +472,7 @@ public class BuildTable {
             prep.close();
 
         }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() + " in PokemonAbilityMapping");
             System.exit(0);
         }
     }
@@ -493,7 +496,7 @@ public class BuildTable {
             prep.close();
 
         }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() + " in PokemonFormsMapping");
             System.exit(0);
         }
     }
@@ -548,7 +551,7 @@ public class BuildTable {
             prep.close();
 
         } catch (Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage());
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() + " in PokemonMoves");
             System.exit(0);
         }
     }
@@ -572,7 +575,7 @@ public class BuildTable {
             prep.close();
 
         }catch(Exception e){
-            System.err.println( e.getClass().getName() + ": " + e.getMessage());
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() + " in PokemonMoveMapping");
             System.exit(0);
         }
     }
