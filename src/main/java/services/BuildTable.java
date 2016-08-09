@@ -300,6 +300,30 @@ public class BuildTable {
         }
     }
 
+    static void createPokemonHeldItemsMapping(Connection cnxn){
+        Statement stmt;
+        try{
+            cnxn.setAutoCommit(false);
+            stmt = cnxn.createStatement();
+
+            stmt.executeUpdate("DROP TABLE IF EXISTS PokemonHeldItemMapping");
+            cnxn.commit();
+
+            String createQuery = "CREATE TABLE PokemonHeldItemMapping (" +
+                    "pokemonId INT NOT NULL, " +
+                    "HeldItemId INT NOT NULL, " +
+                    "PRIMARY KEY (pokemonId, HeldItemId), " +
+                    "FOREIGN KEY (pokemonId) REFERENCES Pokemon(Id))";
+
+            stmt.executeUpdate(createQuery);
+            cnxn.commit();
+
+        }catch (Exception e){
+            System.err.println(e.getClass().getName() + ": " + e.getMessage() + " in PokemonHeldItemMapping");
+            System.exit(0);
+        }
+    }
+
     static void insertPokemonData(Connection cnxn, int id, String name, int baseExp, int height, boolean dfSpecies,
                                   int order, int weight, int genderRate, int captureRate, int happy, boolean isBaby, int hatch,
                                   boolean genderDiff, boolean forms, int growthRate, int shapeId,
@@ -576,6 +600,30 @@ public class BuildTable {
 
         }catch(Exception e){
             System.err.println( e.getClass().getName() + ": " + e.getMessage() + " in PokemonMoveMapping");
+            System.exit(0);
+        }
+    }
+
+    static void insertPokemonHeldItemMapping(Connection cnxn, int pokemonId, int itemId){
+        PreparedStatement prep;
+        try{
+            cnxn.setAutoCommit(false);
+            String insertQuery = "INSERT INTO PokemonHeldItemMapping (pokemonId, HeldItemId) " +
+                    "VALUES (?, ?)";
+
+            prep = cnxn.prepareStatement(insertQuery);
+
+            prep.setInt(1, pokemonId);
+            prep.setInt(2, itemId);
+
+            prep.addBatch();
+            prep.executeBatch();
+
+            cnxn.commit();
+            prep.close();
+
+        } catch(Exception e){
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() + " in PokemonHeldItemMapping");
             System.exit(0);
         }
     }

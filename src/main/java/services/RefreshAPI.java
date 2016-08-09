@@ -22,7 +22,7 @@ public class RefreshAPI {
         BuildTable.createPokemonVersionGameIndexTable(cnxn);
         BuildTable.createPokemonMoveMapping(cnxn);
         BuildTable.createPokemonMoves(cnxn);
-
+        BuildTable.createPokemonHeldItemsMapping(cnxn);
 
         int id = 1;
         while(id < maxPokeId){
@@ -120,10 +120,8 @@ public class RefreshAPI {
 
 
         for (PokemonHeldItem h : poke.getHeldItems()) {
-            System.out.println(h);
 
-            System.out.println(pokeId);
-            System.out.println(h.getItem().getId());
+            BuildTable.insertPokemonHeldItemMapping(cnxn, pokeId, h.getItem().getId());
         }
     }
 
